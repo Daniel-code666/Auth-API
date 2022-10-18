@@ -97,8 +97,14 @@ namespace Auth_API.Controllers
             try
             {
                 var result = _userRepo.ValidToken(token);
-
-                return Ok(new {msg = result});
+                if (result)
+                {
+                    return Ok(new {msg = result});
+                }
+                else
+                {
+                    return Unauthorized(new {msg = result});
+                }
             }catch(Exception ex)
             {
                 return BadRequest(ex.Message);

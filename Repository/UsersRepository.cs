@@ -85,7 +85,7 @@ namespace Auth_API.Repository
             }
         }
 
-        public string ValidToken(string token)
+        public bool ValidToken(string token)
         {
             try
             {
@@ -105,10 +105,10 @@ namespace Auth_API.Repository
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var userId = jwtToken.Claims.First(x => x.Type == "unique_name").Value;
 
-                return "true: " + userId;
+                return true;
             }catch(Exception ex)
             {
-                return "false: " + ex.Message;
+                return false;
             }
         }
     }
