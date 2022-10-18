@@ -9,6 +9,7 @@ namespace Auth_API.Repository.IRepository
         bool UserExists(string userEmail);
         Users Register(Users user, string password);
         Users Login(string userEmail, string password);
+        string ValidToken(string token);
         bool Save();
     }
 }

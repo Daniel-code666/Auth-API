@@ -90,5 +90,19 @@ namespace Auth_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        public IActionResult ValidToken(string token)
+        {
+            try
+            {
+                var result = _userRepo.ValidToken(token);
+
+                return Ok(new {msg = result});
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

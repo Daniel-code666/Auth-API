@@ -1,16 +1,21 @@
 ﻿using Auth_API.Data;
 using Auth_API.Models;
 using Auth_API.Repository.IRepository;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace Auth_API.Repository
 {
     public class UsersRepository : IUsersRepository
     {
         private readonly ApplicationDbContext _db;
+        private readonly IConfiguration config;
 
-        public UsersRepository(ApplicationDbContext db)
+        public UsersRepository(ApplicationDbContext db, IConfiguration config)
         {
             _db = db;
+            this.config = config;
         }
 
         public ICollection<Users> GetUsers()
@@ -77,6 +82,33 @@ namespace Auth_API.Repository
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        public string ValidToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var SecretKey = config.GetValue<string>("AppSettings:Token");
+                var key = Encoding.ASCII.GetBytes(SecretKey);
+
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var userId = jwtToken.Claims.First(x => x.Type == "unique_name").Value;
+
+                return "true: " + userId;
+            }catch(Exception ex)
+            {
+                return "false: " + ex.Message;
             }
         }
     }
