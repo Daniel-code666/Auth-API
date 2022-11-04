@@ -110,5 +110,18 @@ namespace Auth_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        public IActionResult GetUserName(UserAuthLogin user)
+        {
+            try
+            {
+                var singleUser = _userRepo.GetUserName(user.UserEmail);
+                return Ok(new {name = singleUser.UserName});
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -111,5 +111,12 @@ namespace Auth_API.Repository
                 return false;
             }
         }
+
+        public Users GetUserName(string userEmail)
+        {
+            var user = _db.User.FirstOrDefault(u => u.UserEmail == userEmail);
+
+            return user;
+        }
     }
 }
