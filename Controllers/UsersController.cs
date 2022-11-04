@@ -59,30 +59,14 @@ namespace Auth_API.Controllers
 
                 if (loggedUser == null) return Unauthorized();
 
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, loggedUser.UserId.ToString()),
-                    new Claim(ClaimTypes.Name, loggedUser.UserEmail.ToString())
-                };
+                var token = _userRepo.CreateToken(loggedUser.UserName, loggedUser.UserEmail);
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
-
-                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(claims),
-                    Expires = DateTime.Now.AddDays(1),
-                    SigningCredentials = credentials
-                };
-
-                var tokenHandler = new JwtSecurityTokenHandler();
-
-                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var username = _userRepo.GetUserName(loggedUser.UserEmail);
 
                 return Ok(new
                 {
-                    token = tokenHandler.WriteToken(token)
+                    token,
+                    username,
                 });
             }
             catch (Exception ex)

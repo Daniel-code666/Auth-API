@@ -3,6 +3,7 @@ using Auth_API.Models;
 using Auth_API.Repository.IRepository;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace Auth_API.Repository
@@ -117,6 +118,41 @@ namespace Auth_API.Repository
             var user = _db.User.FirstOrDefault(u => u.UserEmail == userEmail);
 
             return user;
+        }
+
+        public string CreateToken(string userId, string userEmail)
+        {
+            try
+            {
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userId),
+                    new Claim(ClaimTypes.Name, userEmail)
+                };
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("AppSettings:Token").Value));
+
+                var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(claims),
+                    Expires = DateTime.Now.AddDays(1),
+                    SigningCredentials = credentials
+                };
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                var defTkn = tokenHandler.WriteToken(token);
+
+                return defTkn;
+            }
+            catch(Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }

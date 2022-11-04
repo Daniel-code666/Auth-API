@@ -11,6 +11,7 @@ namespace Auth_API.Repository.IRepository
         Users Register(Users user, string password);
         Users Login(string userEmail, string password);
         bool ValidToken(string token);
+        string CreateToken(string userId, string userEmail);
         bool Save();
     }
 }
