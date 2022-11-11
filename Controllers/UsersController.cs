@@ -107,5 +107,17 @@ namespace Auth_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        public IActionResult GetUsers()
+        {
+            try
+            {
+                return Ok(_userRepo.GetUsers());
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
